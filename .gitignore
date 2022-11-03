@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 /logs
+/artifact
 
 # Exclude test and ipyn
 Test.py
