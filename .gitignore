@@ -131,6 +131,7 @@ dmypy.json
 /logs
 /artifact
 /notebooks
+/saved_models
 
 # Exclude test and ipyn
 Test.py
