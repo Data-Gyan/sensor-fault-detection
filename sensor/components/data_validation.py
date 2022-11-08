@@ -60,7 +60,11 @@ class DataValidation:
         except Exception as e:
             raise SensorException(e,sys)
     
-
+    """
+    Detect drift of current dataset from the base dataset. It is done for every individual column
+    one by one and a report is generated for p-values and drift status.
+    The method performs the two-sample Kolmogorov-Smirnov test for goodness of fit.
+    """
     def detect_dataset_drift(self,base_df,current_df,threshold=0.05)->bool:
         try:
             status=True

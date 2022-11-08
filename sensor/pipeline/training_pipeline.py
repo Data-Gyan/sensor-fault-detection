@@ -7,15 +7,15 @@ from sensor.components.data_transformation import DataTransformation
 from sensor.entity.artifact_entity import DataIngestionArtifact, DataValidationArtifact, DataTransformationArtifact
 from sensor.entity.config_entity import TrainingPipelineConfig,DataIngestionConfig,DataValidationConfig,DataTransformationConfig
 
-
 class TrainPipeline:
 
     def __init__(self):
         self.training_pipeline_config = TrainingPipelineConfig()
         self.data_ingestion_config = DataIngestionConfig(training_pipeline_config = self.training_pipeline_config)
         
-
-
+    """
+    Pulls data from the datasource, saves on disk and returns disk file path.
+    """
     def start_data_ingestion(self)->DataIngestionArtifact:
         try:
             logging.info("Starting data ingestion")
@@ -26,6 +26,10 @@ class TrainPipeline:
         except  Exception as e:
             raise  SensorException(e,sys)
 
+    """
+    The method takes 'injested data file path' and starts data validation as per the component
+    'DataValidation'.
+    """
     def start_data_validaton(self,data_ingestion_artifact:DataIngestionArtifact)->DataValidationArtifact:
         try:
             data_validation_config = DataValidationConfig(training_pipeline_config=self.training_pipeline_config)
@@ -37,6 +41,10 @@ class TrainPipeline:
         except  Exception as e:
             raise  SensorException(e,sys)
 
+
+    """
+   TRansforms data.
+    """
     def start_data_transformation(self,data_validation_artifact:DataValidationArtifact):
         try:
             data_transformation_config = DataTransformationConfig(training_pipeline_config=self.training_pipeline_config)

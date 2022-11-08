@@ -22,6 +22,7 @@ from sensor.utils.main_utils import save_numpy_array_data, save_object
 
 
 class DataTransformation:
+
     def __init__(self,data_validation_artifact: DataValidationArtifact, 
                     data_transformation_config: DataTransformationConfig,):
         """
@@ -76,15 +77,22 @@ class DataTransformation:
             target_feature_train_df = train_df[TARGET_COLUMN]
             target_feature_train_df = target_feature_train_df.replace( TargetValueMapping().to_dict())
 
+            #VT- Check if any target row has incorrect value( neither 'pos' not 'neg') and drop them
+
             #testing dataframe
             input_feature_test_df = test_df.drop(columns=[TARGET_COLUMN], axis=1)
             target_feature_test_df = test_df[TARGET_COLUMN]
             target_feature_test_df = target_feature_test_df.replace(TargetValueMapping().to_dict())
 
+            # Note : preprocessor_object is created on input train data while its being
+            #  applied to test data as well
             preprocessor_object = preprocessor.fit(input_feature_train_df)
             transformed_input_train_feature = preprocessor_object.transform(input_feature_train_df)
             transformed_input_test_feature =preprocessor_object.transform(input_feature_test_df)
 
+            # EDA showed, the data is imalanced. It has very highly 'neg' but low 'pos'
+            # Hence require balancing. 
+            # Let us use SMOTETomek algorithm for this. : Let  me know the rational of this selection
             smt = SMOTETomek(sampling_strategy="minority")
 
             input_feature_train_final, target_feature_train_final = smt.fit_resample(
@@ -95,6 +103,7 @@ class DataTransformation:
                 transformed_input_test_feature, target_feature_test_df
             )
 
+            # we ra eplanning to dump them as numpy arrays on the disk
             train_arr = np.c_[input_feature_train_final, np.array(target_feature_train_final) ]
             test_arr = np.c_[ input_feature_test_final, np.array(target_feature_test_final) ]
 
