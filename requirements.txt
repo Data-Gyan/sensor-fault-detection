@@ -7,5 +7,6 @@ PyYAML==6.0
 dill==0.3.6
 scipy==1.9.3
 imblearn==0.0
+#pandas-profiling
 
 -e .
