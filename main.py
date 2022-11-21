@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+import pandas as pd
+from fastapi import FastAPI, File, UploadFile
 from starlette.responses import RedirectResponse
 from uvicorn import run as app_run
 from fastapi.responses import Response
@@ -23,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+test_file = ""
 
 @app.get("/", tags=["authentication"])
 async def index():
@@ -40,13 +42,18 @@ async def train_route():
     except Exception as e:
         return Response(f"Error Occurred! {e}")
 
+
+@app.get("/upload")
+async def upload_route(file: UploadFile = File(...)):
+    test_file = file.filename
+
 @app.get("/predict")
 async def predict_route():
     try:
         #get data from user csv file
         #conver csv file to dataframe
-
-        df=None
+        df = pd.DataFrame()
+        df.read_csv(test_file)
         model_resolver = ModelResolver(model_dir=SAVED_MODEL_DIR)
         if not model_resolver.is_model_exists():
             return Response("Model is not available")
@@ -57,12 +64,13 @@ async def predict_route():
         df['predicted_column'] = y_pred
         df['predicted_column'].replace(TargetValueMapping().reverse_mapping(),inplace=True)
         
-        #decide how to return file to user.
+        #decide how to return file to user
+        return Response(df.to_dict())
         
     except Exception as e:
         raise Response(f"Error Occured! {e}")
 
-
+# put your comments here
 def main():
     try:
         training_pipeline = TrainPipeline()
